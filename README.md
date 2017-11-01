@@ -18,6 +18,8 @@ readConf = require("read-conf")
 // readConf(options:Object):Promise
 conf = await readConf({name:"filename"})
 conf.mtime // contains modified time of config file
+// short form is allowed
+packageJson = await readConf("package")
 ```
 
 #### Options

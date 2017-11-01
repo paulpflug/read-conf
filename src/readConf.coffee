@@ -11,7 +11,10 @@ try
   require "babel-register"
 
 module.exports = (o) =>
-  throw new Error "read-conf: no name for config was given" unless o.name
+  if typeof o == "string" or o instanceof String
+    o = name: o 
+  else if not o?.name?
+    throw new Error "read-conf: no name for config was given"
   folders = o.folders || [process.cwd()]
   folders = [folders] unless Array.isArray(folders)
   exts = o.extensions || ["js","coffee","ts","json"]
