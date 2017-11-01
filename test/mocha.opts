@@ -1,0 +1,5 @@
+--require coffeescript/register
+
+--timeout 10000
+
+test/readConf.coffee

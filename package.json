@@ -1,0 +1,41 @@
+{
+  "name": "read-conf",
+  "description": "reads a config file",
+  "version": "0.1.0",
+  "homepage": "https://github.com/paulpflug/",
+  "author": {
+    "name": "Paul Pflugradt",
+    "email": "paul.pflugradt@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/paulpflug/read-conf"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "main": "readConf.js",
+  "files": [
+    "*.js"
+  ],
+  "dependencies": {
+    "fs-extra": "^4.0.2"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "coffeescript": "^2.0.2",
+    "mocha": "^4.0.1"
+  },
+  "keywords": [
+    "config"
+  ],
+  "readmeFilename": "README.md",
+  "scripts": {
+    "build": "coffee --bare --no-header --compile --output . src/*.coffee",
+    "test": "mocha",
+    "preversion": "npm run test",
+    "version": "npm run build && git add .",
+    "postversion": "git push && git push --tags && npm publish"
+  }
+}
