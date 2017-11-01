@@ -9,6 +9,7 @@ try
   require "ts-node/register"
 try
   require "babel-register"
+merge = require "merge-options"
 
 parse = (o) =>
   if typeof o == "string" or o instanceof String
@@ -38,9 +39,10 @@ module.exports = (o) =>
     throw new Error "read-conf: couldn't require '#{confPath}'"
   stats = await fs.stat confPath
   conf.mtime = stats.mtimeMs
+  conf = merge o.default, conf if o.default?
   return conf
 
-module.exports.readMultiple = (o) =>
+readMultiple = module.exports.readMultiple = (o) =>
   confs = []
   [name, folders, exts] = parse(o)
   for folder in folders
@@ -55,3 +57,8 @@ module.exports.readMultiple = (o) =>
           throw new Error "read-conf: couldn't require '#{confPath}'"
         confs.push conf
   return confs
+  
+module.exports.readMultipleAndMerge = (o) =>
+  confs = await readMultiple(o)
+  confs.unshift(o.default) if o.default?
+  return merge.apply(null,confs)
