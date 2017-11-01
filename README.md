@@ -27,7 +27,22 @@ Name | type | default | description
 ---:| --- | ---| ---
 name | String | - | (required) filename of the config
 extensions | Array | `["js","json","coffee","ts"]` | extensions to look out for
-folders | Array or String | `process.cwd()` | folder(s) to search in
+folders | Array or String | `process.cwd()` | folder(s) to search in, can be relative to cwd or absolute
+
+#### Helper
+```js
+// to read all found configuration files
+arrayOfConf = readConf.readMultiple({name:"filename",folders:["./","./someFolder"]})
+
+// to read multiple webpack configs and merge them
+// npm install webpack-merge is required
+readWebpackConf = require("read-config/webpack")
+webpackConf = readWebpackConf({
+  name: "webpack.conf",
+  folders: ["./","./someFolder"],
+  default: someDefaultWebpackConf
+  })
+```
 
 ## License
 Copyright (c) 2017 Paul Pflugradt

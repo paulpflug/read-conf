@@ -11,3 +11,7 @@ describe "readConf", =>
   it "should work with short form", =>
     config = await readConf "package"
     config.name.should.equal "read-conf"
+  it "should be able to read multiple", =>
+    config = await readConf.readMultiple name: "package", folders: ["./","./test"]
+    config[0].name.should.equal "read-conf"
+    config[1].someProp.should.equal "someVal"

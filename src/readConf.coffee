@@ -10,7 +10,7 @@ try
 try
   require "babel-register"
 
-module.exports = (o) =>
+parse = (o) =>
   if typeof o == "string" or o instanceof String
     o = name: o 
   else if not o?.name?
@@ -18,14 +18,19 @@ module.exports = (o) =>
   folders = o.folders || [process.cwd()]
   folders = [folders] unless Array.isArray(folders)
   exts = o.extensions || ["js","coffee","ts","json"]
+  return [o.name, folders, exts]
+
+module.exports = (o) =>
+  [name, folders, exts] = parse(o)
   for folder in folders
+    folder = path.resolve(folder)
     files = await fs.readdir(folder)
     for ext in exts
-      if ~files.indexOf(tmp = "#{o.name}.#{ext}")
+      if ~files.indexOf(tmp = "#{name}.#{ext}")
         conf = tmp
         break
     break if conf
-  throw new Error "read-conf: no file '#{o.name}' found" unless conf 
+  throw new Error "read-conf: no file '#{name}' found" unless conf 
   confPath = path.resolve(folder, conf)
   try
     conf = require confPath
@@ -34,3 +39,19 @@ module.exports = (o) =>
   stats = await fs.stat confPath
   conf.mtime = stats.mtimeMs
   return conf
+
+module.exports.readMultiple = (o) =>
+  confs = []
+  [name, folders, exts] = parse(o)
+  for folder in folders
+    folder = path.resolve(folder)
+    files = await fs.readdir(folder)
+    for ext in exts
+      if ~files.indexOf(tmp = "#{name}.#{ext}")
+        confPath = path.resolve(folder, tmp)
+        try
+          conf = require confPath
+        catch
+          throw new Error "read-conf: couldn't require '#{confPath}'"
+        confs.push conf
+  return confs
