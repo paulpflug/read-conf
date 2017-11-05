@@ -14,8 +14,11 @@ describe "readConf", =>
       default:
         someProp: "test1"
         someProp2: "test2"
+      assign:
+        someProp3: "test3"
     config.someProp.should.equal "test"
     config.someProp2.should.equal "test2"
+    config.someProp3.should.equal "test3"
     should.exist config.mtime
   it "should work with short form", =>
     config = await readConf "package"

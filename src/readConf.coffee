@@ -47,6 +47,7 @@ readConf = (o) =>
   stats = await stat confPath
   conf.mtime = stats.mtimeMs
   conf = merge o.default, conf if o.default?
+  conf = merge conf, o.assign if o.assign?
   return conf
 
 

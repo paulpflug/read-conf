@@ -52,7 +52,8 @@ name | String | - | filename of the config
 extensions | Array | `["js","json","coffee","ts"]` | extensions to look out for
 folders | Array or String | `process.cwd()` | folder(s) to search in, can be relative to cwd or absolute
 filename | String | - | absolute path to the config
-default | Object | - | Object, the config will be merged into if given
+default | Object | - | the config will be merged into this
+assign | Object | - | this will be merged into the config
 cb | Function | - | callback which is called with config obj
 watch | Boolean | false | uses watch
 cancel | Function | - | only with `watch`. Is called on file change when cb is still busy
