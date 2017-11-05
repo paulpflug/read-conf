@@ -20,12 +20,13 @@ readConf = require("read-conf")
 // readConf(options:Object):Promise
 conf = await readConf({name:"filename"})
 conf.mtime // contains modified time of config file
+conf.hash // contains hash of config object
 // short form is allowed
 packageJson = await readConf("package")
 
 // has sophisticated watch functionality 
 unwatch = await readConf({name: "package",watch: true, cb: (conf) => {
-  // config has changed
+  // config has changed 
   // can be async
   return await someStartup(conf)
 }, cancel: () => {

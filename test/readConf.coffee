@@ -56,9 +56,10 @@ describe "readConf", =>
     cb = (conf) =>
       if canceled
         closer()
+        await fs.writeJson filename, prop: "value" 
         done()
       else
-        fs.writeJson filename, prop: "value" 
+        fs.writeJson filename, prop: "value1" 
     readConf 
       name:"watchConf"
       watch: true
@@ -74,9 +75,10 @@ describe "readConf", =>
     cb = (conf) =>
       if canceled
         closer()
+        await fs.writeJson filename, prop: "value" 
         done()
       else
-        fs.writeJson filename, prop: "value" 
+        fs.writeJson filename, prop: "value1" 
     i = 0
     readConf 
       name:"watchConf"
@@ -90,6 +92,6 @@ describe "readConf", =>
         setTimeout (=>
           resolve()
           ),50
-        fs.writeJson filename, prop: "value"
+        fs.writeJson filename, prop: "value2"
     .then (close) => closer = close
     return null

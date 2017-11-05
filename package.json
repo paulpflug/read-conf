@@ -13,7 +13,7 @@
     "url": "git://github.com/paulpflug/read-conf"
   },
   "engines": {
-    "node": "*"
+    "node": ">=8.9.0"
   },
   "main": "readConf.js",
   "files": [

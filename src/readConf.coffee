@@ -2,19 +2,25 @@ stat = null
 readdir = null
 path = null
 merge = null
+hash = null
 start = =>
   unless stat?
     {stat,readdir} = require "fs-extra"
     path = require "path"
+    {createHash} = require "crypto"
+    hash = (obj) => createHash("md5").update(JSON.stringify(obj)).digest("hex")
+    requireFromCWD = (name) =>
+      entry = require.resolve(name, { paths: [path.join(process.cwd(), "node_modules")] })
+      require entry
     try
-      require "coffeescript/register"
+      requireFromCWD "coffeescript/register"
     catch
       try
-        require "coffee-script/register"
+        requireFromCWD "coffee-script/register"
     try
-      require "ts-node/register"
+      requireFromCWD "ts-node/register"
     try
-      require "babel-register"
+      requireFromCWD "babel-register"
     merge = require "merge-options"
 
 readConf = (o) =>
@@ -45,6 +51,7 @@ readConf = (o) =>
   catch e
     throw new Error "read-conf: couldn't require '#{confPath}'"
   stats = await stat confPath
+  conf.hash = hash(conf)
   conf.mtime = stats.mtimeMs
   conf = merge o.default, conf if o.default?
   conf = merge conf, o.assign if o.assign?
@@ -59,12 +66,30 @@ watch = (o) =>
 
   unwatchedModules = []
   filesToWatch = []
-  isDone = false
+  isDone = true
   isCanceling = false
+  hasChanged = false
+  oldHash = 0
   done = (promise) =>
-    promise.then(o.cb)
-    .then => isDone = true
-    .catch (e) => console.log e
+    wasDone = isDone
+    isDone = false
+    conf = await promise
+    if conf.hash != oldHash
+      oldHash = conf.hash
+      unless wasDone
+        hasChanged = false
+        isCanceling = true
+        try
+          await o.cancel?()
+        catch e
+          console.log e
+        isCanceling = false
+        conf = await readConf(o) if hasChanged
+      try
+        await o.cb(conf)
+      catch e
+        console.log e
+    isDone = true
 
   for k,v of require.cache
     unwatchedModules.push k
@@ -77,13 +102,8 @@ watch = (o) =>
   watcher = chokidar.watch filesToWatch, ignoreInitial: true
   watcher.on "all", (e, filepath) =>
     uncache(filepath,__filename)
+    hasChanged = true
     unless isCanceling
-      unless isDone
-        isCanceling = true
-        await o.cancel?() 
-        isCanceling = false
-      else
-        isDone = false
       done(readConf(o))
 
   setTimeout (=>done(promise)),0
