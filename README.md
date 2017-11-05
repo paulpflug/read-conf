@@ -7,6 +7,8 @@ Using if available:
 - coffee-script/register
 - ts-node/register
 
+Can also watch a config file and all of its dependencies using `chokidar` and `recursive-uncache`.
+
 ### Install
 ```sh
 npm install --save read-conf
@@ -20,32 +22,40 @@ conf = await readConf({name:"filename"})
 conf.mtime // contains modified time of config file
 // short form is allowed
 packageJson = await readConf("package")
+
+// has sophisticated watch functionality 
+unwatch = await readConf({name: "package",watch: true, cb: (conf) => {
+  // config has changed
+  // can be async
+  return await someStartup(conf)
+}, cancel: () => {
+  // config has changed, but last cb didn't return yet
+  // cb will be called again, once this functions returns
+  // implement some sort of sleep to wait for other files to change
+  await Promise((resolve) => {setTimeout(resolve, 100)})
+  // can be async
+  return await someTearDown()
+}})
+unwatch() // once you want to cancel watching
+
+// cb syntax also possible without watch
+unwatch = await readConf({name: "package",watch: false, cb: (conf) => {
+
+}})
+unwatch() // empty function, save to call
 ```
 
 #### Options
 Name | type | default | description
 ---:| --- | ---| ---
-name | String | - | (required) filename of the config
+name | String | - | filename of the config
 extensions | Array | `["js","json","coffee","ts"]` | extensions to look out for
 folders | Array or String | `process.cwd()` | folder(s) to search in, can be relative to cwd or absolute
+filename | String | - | absolute path to the config
 default | Object | - | Object, the config will be merged into if given
-
-#### Helper
-```js
-// to read all found configuration files
-arrayOfConf = readConf.readMultiple({name:"filename",folders:["./","./someFolder"]})
-
-// to also merge them
-conf = readConf.readMultipleAndMerge({name:"filename",folders:["./","./someFolder"]})
-
-// to read multiple webpack configs and merge them
-// npm install webpack-merge is required
-readWebpackConf = require("read-config/webpack")
-webpackConf = readWebpackConf({
-  name: "webpack.conf",
-  folders: ["./","./someFolder"],
-  default: someDefaultWebpackConf
-  })
+cb | Function | - | callback which is called with config obj
+watch | Boolean | false | uses watch
+cancel | Function | - | only with `watch`. Is called on file change when cb is still busy
 ```
 
 ## License
