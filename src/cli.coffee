@@ -18,10 +18,10 @@ importCwd.silent "coffee-script/register"
 importCwd.silent "coffeescript/register"
 importCwd.silent "ts-node/register"
 importCwd.silent "babel-register"
+{resolve} = require "path"
 unless schemaFile
-  getSchemaFile = =>
+  getSchemaFile = (=>
     {stat,readdir,pathExists} = require "fs-extra"
-    {resolve} = require "path"
     folders = ["./src","./lib",process.cwd()]
     exts = ["js","coffee","ts","json"]
     for folder in folders
@@ -33,9 +33,11 @@ unless schemaFile
             schemaFile = resolve(folder,tmp)
             break
         break if schemaFile
+      )()
 else
-  getSchemaFile = Promise.resolve
-getSchemaFile().then =>
+  schemaFile = resolve(schemaFile)
+  getSchemaFile = Promise.resolve()
+getSchemaFile.then =>
   schema = require schemaFile
   {toDoc, getAdder} = require "./validate"
   if (configSchema = schema.configSchema)?
