@@ -156,9 +156,9 @@ module.exports = {
 
 ```sh
 # terminal
-getDoc --help
+toDoc --help
 
-# usage: getDoc (schema file)
+# usage: toDoc (schema file)
 
 # schema file is optional and defaults to "configSchema.[js|json|coffee|ts]"
 # in "src/", "lib/", "/"

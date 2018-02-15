@@ -5,7 +5,7 @@ for arg,i in args
   if arg[0] == "-"
     switch arg
       when '-h', "--help"
-        console.log('usage: getDoc (schema file)')
+        console.log('usage: toDoc (schema file)')
         console.log('')
         console.log('schema file is optional and defaults to "configSchema.[js|json|coffee|ts]"')
         console.log('in "src/", "lib/", "/"')
