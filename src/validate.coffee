@@ -186,13 +186,13 @@ module.exports.toDoc = (schema, type) =>
     if ~names.indexOf("Object") or ~names.indexOf("Array")
       dynamic = []
       children = keys.filter (key) =>
-        if key.startsWith(k)
+        if key.startsWith(k+"$")
           if key.startsWith(k+"$_item")
             dynamic.push(key)
             return false
           return true
         return false
-      if children.length > 1
+      if children.length > 0
         if def == "{},"
           def = "{"
           typeAbove = true
