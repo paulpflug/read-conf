@@ -8,7 +8,7 @@ confName = (name) => path.resolve(__dirname,name)
 
 describe "readConf", =>
   it "should work", =>
-    config = await readConf 
+    {config, readConfig} = await readConf 
       name: "testConf"
       folders:__dirname
       default:
@@ -19,79 +19,83 @@ describe "readConf", =>
     config.someProp.should.equal "test"
     config.someProp2.should.equal "test2"
     config.someProp3.should.equal "test3"
-    should.exist config.mtime
+    should.exist readConfig.mtime
   it "should work with short form", =>
-    config = await readConf "package"
+    {config} = await readConf "package"
     config.name.should.equal "read-conf"
-  it "should work with watch", (done) =>
+  it "should work with schema", =>
+    {config, readConfig} = await readConf 
+      name: "testConf"
+      folders:__dirname
+      schema:
+        someProp: 
+          type: String
+          default:"test1"
+        someProp2: 
+          type: String
+          default:"test2"
+        someProp3: String
+      assign:
+        someProp3: "test3"
+    config.someProp.should.equal "test"
+    config.someProp2.should.equal "test2"
+    config.someProp3.should.equal "test3"
+    should.exist readConfig.mtime
+  it "should work with watch", => new Promise (resolve) =>
     i = 0
-    closer = null
-    filename = confName("watchConf.json")
-    cb = (conf) =>
-      try
-        if i == 0
-          i++
-          conf.prop.should.equal "value"
-          fs.writeJson filename, prop: "value2"
-        else if i == 1
-          conf.prop.should.equal "value2"
-          closer?()
-          fs.writeJson filename, prop: "value" 
-          .then done
-      catch e
-        await fs.writeJson filename, prop: "value"
-        closer?()
-        done e
+    filename = confName("watchConf1.json")
+    await fs.writeJson filename, prop: "value"
     readConf 
-      name:"watchConf"
+      name:"watchConf1"
       watch: true
-      cb: cb
       folders:__dirname
-    .then (close) => closer = close
-    return null
-  it "should work with cancel", (done) =>
-    closer = null
+      cb: ({config, readConfig}) =>
+        try
+          if i == 0
+            i++
+            config.prop.should.equal "value"
+            fs.writeJson filename, prop: "value2"
+          else if i == 1
+            config.prop.should.equal "value2"
+            throw null
+        catch e
+          readConfig.close()
+          fs.unlink filename
+          resolve e
+      
+  it "should work with cancel", => 
+    resolve = null
+    prom = new Promise (res) => resolve = res
+    filename = confName("watchConf2.json")
+    await fs.writeJson filename, prop: "value2" 
+    {close} = await readConf 
+      name:"watchConf2"
+      watch: true
+      folders:__dirname
+      cancel: resolve
+      cb: => new Promise (res) =>
+        fs.writeJson filename, prop: "value4"
+        setTimeout res, 150
+    
+    return prom.then close
+      .then => fs.unlinkSync filename
+
+  it "should not call cancel when busy", => new Promise (resolve) =>
     canceled = false
-    filename = confName("watchConf.json")
-    cb = (conf) =>
-      if canceled
-        closer()
-        await fs.writeJson filename, prop: "value" 
-        done()
-      else
-        fs.writeJson filename, prop: "value1" 
+    filename = confName("watchConf3.json")
+    await fs.writeJson filename, prop: "value3"
     readConf 
-      name:"watchConf"
+      name:"watchConf3"
       watch: true
-      cb: cb
-      folders:__dirname
-      cancel: => canceled = true
-    .then (close) => closer = close
-    return null
-  it "should not call cancel when busy", (done) =>
-    closer = null
-    canceled = false
-    filename = confName("watchConf.json")
-    cb = (conf) =>
-      if canceled
-        closer()
-        await fs.writeJson filename, prop: "value" 
-        done()
-      else
-        fs.writeJson filename, prop: "value1" 
-    i = 0
-    readConf 
-      name:"watchConf"
-      watch: true
-      cb: cb
-      folders:__dirname
-      cancel: => new Promise (resolve) =>
-        i.should.equal 0
-        i++
-        canceled = true
-        setTimeout (=>
+      cb: ({readConfig}) => new Promise (res) =>
+        if canceled
+          readConfig.close()
+          await fs.unlink(filename)
           resolve()
-          ),50
-        fs.writeJson filename, prop: "value2"
-    .then (close) => closer = close
-    return null
+        else
+          await fs.writeJson filename, prop: "value6"
+          setTimeout res, 150
+      folders:__dirname
+      cancel: => 
+        canceled = true
+        fs.writeJson filename, prop: "value9"

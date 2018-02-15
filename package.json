@@ -15,27 +15,34 @@
   "engines": {
     "node": ">=8.9.0"
   },
-  "main": "readConf.js",
+  "main": "lib/readConf.js",
   "files": [
-    "*.js"
+    "lib/",
+    "cli.js"
   ],
+  "bin": {
+    "toDoc": "cli.js"
+  },
   "dependencies": {
-    "chokidar": "^1.7.0",
-    "fs-extra": "^4.0.2",
+    "chalk": "^2.3.1",
+    "chokidar": "^2.0.2",
+    "fs-extra": "^5.0.0",
+    "import-cwd": "^2.1.0",
     "merge-options": "^1.0.0",
-    "recursive-uncache": "^0.1.0"
+    "recursive-uncache": "^0.1.1",
+    "resolve-from": "^4.0.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "coffeescript": "^2.0.2",
-    "mocha": "^4.0.1"
+    "coffeescript": "^2.2.1",
+    "mocha": "^5.0.0"
   },
   "keywords": [
     "config"
   ],
   "readmeFilename": "README.md",
   "scripts": {
-    "build": "coffee --bare --no-header --compile --output . src/*.coffee",
+    "build": "coffee --bare --no-header --compile --output lib/ src/*.coffee",
     "test": "mocha",
     "preversion": "npm run test",
     "version": "npm run build && git add .",
