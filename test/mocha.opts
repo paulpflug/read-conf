@@ -1,6 +1,0 @@
---require coffeescript/register
-
---timeout 2000
-
-test/readConf.coffee
-test/validate.coffee

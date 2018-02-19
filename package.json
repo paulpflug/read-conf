@@ -33,9 +33,9 @@
     "resolve-from": "^4.0.0"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
+    "coffee-loader": "^0.9.0",
     "coffeescript": "^2.2.1",
-    "mocha": "^5.0.0"
+    "snapy": "^0.1.1"
   },
   "keywords": [
     "config"
@@ -43,7 +43,7 @@
   "readmeFilename": "README.md",
   "scripts": {
     "build": "coffee --bare --no-header --compile --output lib/ src/*.coffee",
-    "test": "mocha",
+    "test": "snapy",
     "preversion": "npm run test",
     "version": "npm run build && git add .",
     "postversion": "git push && git push --tags && npm publish"

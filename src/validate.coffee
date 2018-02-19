@@ -25,7 +25,7 @@ allTypes.forEach ({name}) =>
 normalize = (schema) =>
   for k,v of schema
     if v.type
-      types = v.type 
+      v.types = types = v.type 
     else unless (types = v.types)?
       v = schema[k] = {types: (types = [v])}
     unless Array.isArray(types)
@@ -218,7 +218,8 @@ module.exports.toDoc = (schema, type) =>
       for dyn in dynamic
         tmpval = schema[dyn]
         ignore.push dyn
-        lines.push ind + "// $item (" + getTypes(false, tmpval)+") " + (tmpval.desc or "")
+        dynName = "$" + realKey(dyn.replace(k+"$_item","item"))
+        lines.push ind + "// #{dynName} (" + getTypes(false, tmpval)+") " + (tmpval.desc or "")
 
     # value
     k = k.replace(parent+"$","") if parent
