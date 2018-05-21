@@ -92,6 +92,7 @@ module.exports = (obj, schema, {isNormalized, ignore = []} = {} ) => new Promise
     delete required[key]
     return true if ~ignore.indexOf(key)
     return false unless currSchema?
+    return true unless curr?
     unless isValid(curr, currSchema)
       addProblem key, getTypeError(curr, currSchema)
     if _is.array(curr)
