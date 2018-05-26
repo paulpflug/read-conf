@@ -56,12 +56,13 @@ readConfig = (o) =>
             conf = tmp
             break
         break if conf
-    if conf
-      confPath = o.filename = path.resolve(folder, conf)
-    else unless o.required == false
-      throw new Error "read-conf: no file '#{name}' found"
+    confPath = o.filename = path.resolve(folder, conf) if conf
+
   if confPath
     statsDone = stat(confPath).then (stats) => o.mtime = stats.mtimeMs
+    .catch =>
+      unless o.required == false
+        throw new Error "read-conf: no file '#{name}' found"
 
   if o.watch
     unwatchedModules = []
