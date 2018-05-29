@@ -14,9 +14,9 @@ test (snap) =>
         someProp2: "test2"
       assign:
         someProp3: "test3"
-  }), filter: "config"
+  }), filter: "resolved.config"
   # short form
-  snap promise: readConf("package"), filter: "config.name"
+  snap promise: readConf("package"), filter: "resolved.config.name"
   # with schema
   snap promise: readConf({
       name: "_testConf"
@@ -31,7 +31,7 @@ test (snap) =>
         someProp3: String
       assign:
         someProp3: "test3"
-  }), filter: "config"
+  }), filter: "resolved.config"
 
 test (snap, cleanUp) =>
   filename = confName("watchConf1.json")
