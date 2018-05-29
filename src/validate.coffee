@@ -24,6 +24,7 @@ allTypes.forEach ({name}) =>
 
 normalize = (schema) =>
   for k,v of schema
+    continue if k == "__strict"
     if v.type
       v.types = types = v.type 
     else unless (types = v.types)?
@@ -108,8 +109,9 @@ module.exports = (obj, schema, {isNormalized, ignore = []} = {} ) => new Promise
         else unless isStrict
           walk(item, (newKey = getKey(key,"_item")), schema[newKey])
     return true
-        
-  walk obj, "", {_types: [_is.object], strict: true}
+  strict = schema.__strict 
+  strict ?= true
+  walk obj, "", {_types: [_is.object], strict: strict}
   iterate required, (k) => addProblem k, "missing"
   if (keys = Object.keys(problems)).length > 0
     reject(keys.sort().map((key) => "'#{key}' is #{problems[key]}" ))
@@ -152,6 +154,7 @@ module.exports.toDoc = (schema, type) =>
   indent = 1
   getIndent = => indention.repeat(indent)
   normalize(schema)
+  delete schema.__strict
   keys = Object.keys(schema)
   if keys.length < 5
     lines.push "\n  // …"
