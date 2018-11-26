@@ -18,7 +18,7 @@
   "main": "lib/main.js",
   "files": [
     "lib/",
-    "cli.js"
+    "toDoc.js"
   ],
   "bin": {
     "toDoc": "toDoc.js"
