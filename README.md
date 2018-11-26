@@ -33,7 +33,7 @@ This package is an allround tool for reading configuration files.
 - watch functionality
 - schema validation
 - doc generation from schema
-- loads plugins and allows them to change the configuration schema
+- loads plugins
 
 
 ### Install
@@ -65,7 +65,7 @@ required | Boolean | true | will throw when no configuration file is found
 schema | String or Object | - | File or Object used to validate configuration file
 cb | Function | - | callback which is called with config obj
 watch | Boolean | false | watches configuration file and dependencies for changes
-cancel | Function | - | only with `watch`. Is called on file change
+cancel | Function | - | Is called on file change
 plugins | Boolean or Object | false | activate plugin management
 prop | String | "config" | where to save config object
 base | Object | {} | Object where config is saved to
@@ -90,9 +90,13 @@ readConf({name:"filename", base: base, prop:"conf", cb: (value) => {
   base.conf // content of file: "filename" 
   base.readConfig // Options object from above
   base.readConfig.hash // hash of config
+  return () => {
+    // do cleanUp
+    // will be called on close(), SIGINT, SIGTERM and SIGHUP
+  }
 }}).then((value) => {
   value // Options object from above
-  value.base === base // true
+  value.bases[0] === base // true
   value.close // to close watcher and call cancel cb if watch == true
   value.watcher // chokidar filewatcher
 })

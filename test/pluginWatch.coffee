@@ -1,37 +1,9 @@
 {test} = require "snapy"
 path = require "path"
 fs = require "fs-extra"
-readConf = require "!./src/readConf.coffee"
+readConf = require "!./src/main.coffee"
 
 confName = (name) => path.resolve(__dirname,name)
-
-test (snap) =>
-  snap promise: readConf({
-      name: "_testConf"
-      folders: "./test"
-      default:
-        someProp: "test1"
-        someProp2: "test2"
-      assign:
-        someProp3: "test3"
-  }), filter: "resolved.config"
-  # short form
-  snap promise: readConf("package"), filter: "resolved.config.name"
-  # with schema
-  snap promise: readConf({
-      name: "_testConf"
-      folders:"./test"
-      schema:
-        someProp: 
-          type: String
-          default:"test1"
-        someProp2: 
-          type: String
-          default:"test2"
-        someProp3: String
-      assign:
-        someProp3: "test3"
-  }), filter: "resolved.config"
 
 test (snap, cleanUp) =>
   filename = confName("watchConf1.json")
@@ -45,9 +17,11 @@ test (snap, cleanUp) =>
     cb: ({config, readConfig}) =>
       if i++ == 0
         cleanUp => readConfig.close()
+        # should have value
         snap obj: config
         fs.writeJson filename, prop: "value2"
       else
+        #should have value2
         snap obj: config
 
 test (snap, cleanUp) =>
@@ -59,6 +33,9 @@ test (snap, cleanUp) =>
     watch: true
     folders:__dirname
     cancel: (obj) =>
-      cleanUp => obj.readConfig.close()
+      obj.readConfig.watcher.close()
+      # should have value2
       snap obj: obj.config
-    cb: => fs.writeJson filename, prop: "value4"
+    cb: => 
+      fs.writeJson filename, prop: "value4"
+      .then => new Promise (resolve) => setTimeout resolve, 200
