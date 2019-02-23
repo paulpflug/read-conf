@@ -1,7 +1,7 @@
 mergeOptions = require "merge-options"
 module.exports = ({read, run, cleanUp, position}) =>
-  read.hookIn position.after, (o) =>
-    unless o.state.closing
+  read.hookIn position.after, (noop, o) =>
+    unless o.state.cleaning
       if (iterate = o.iterate)?
         if o.util.isString(iterate)
           arr = o[iterate]
@@ -31,7 +31,7 @@ module.exports = ({read, run, cleanUp, position}) =>
         runners.push o.run(base)
       Promise.all(runners)
 
-  cleanUp.hookIn position.before, (o) =>
+  cleanUp.hookIn position.before, (noop, o) =>
     if o.cancel? and o.bases? and o.state.running
       Promise.all(o.bases.map (tmpBase) => o.cancel(tmpBase)).then o.state.running
   
@@ -47,7 +47,7 @@ module.exports = ({read, run, cleanUp, position}) =>
           throw e
       o._cleanUps.push val if val? and typeof val == "function"
   
-  cleanUp.hookIn (o) =>
+  cleanUp.hookIn (noop, o) =>
     if (cleanUps = o._cleanUps)? and cleanUps.length > 0
       Promise.all(cleanUps)
       .then (cleanUps) =>

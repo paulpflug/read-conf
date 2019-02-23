@@ -2,7 +2,7 @@ importCwd = null
 
 module.exports = ({read, position}) =>
 
-  read.hookIn position.init, (o) =>
+  read.hookIn position.init, (noop, o) =>
     {resolve} = o.path
     unless o.filename?
       unless o.name?
@@ -24,7 +24,7 @@ module.exports = ({read, position}) =>
     else
       o.filename = resolve(o.filename)
 
-  read.hookIn position.before, (o) =>
+  read.hookIn position.before, (noop, o) =>
     if o.filename?
       {stat} = o.fs
       stat(o.filename).then (stats) => 
@@ -41,7 +41,7 @@ module.exports = ({read, position}) =>
           importCwd.silent "babel-register"
   
   
-  read.hookIn (o) =>
+  read.hookIn (noop, o) =>
     if o.filename?
       try
         conf = require o.filename

@@ -24,17 +24,17 @@
     "toDoc": "toDoc.js"
   },
   "dependencies": {
-    "chokidar": "^2.0.4",
+    "chokidar": "^2.1.2",
     "fs-extra": "^7.0.1",
     "import-cwd": "^2.1.0",
     "merge-options": "^1.0.1",
     "recursive-uncache": "^0.1.1",
-    "resolve-from": "^4.0.0"
+    "resolve-from": "^4.0.0",
+    "hook-up": "^0.2.6"
   },
   "devDependencies": {
     "coffee-loader": "^0.9.0",
     "coffeescript": "^2.3.2",
-    "hook-up": "^0.2.5",
     "snapy": "^0.1.6"
   },
   "keywords": [

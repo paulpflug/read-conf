@@ -1,7 +1,7 @@
 chokidar = uncache = null
 
 module.exports = ({read, run, cleanUp, position}) =>
-  read.hookIn position.before, (o) =>
+  read.hookIn position.before, (noop, o) =>
     if o.watch 
       chokidar = require "chokidar"
       uncache = require "recursive-uncache"
@@ -62,7 +62,7 @@ module.exports = ({read, run, cleanUp, position}) =>
 
         o.watcher.on "all", (e, file) => o.invalidate(file)
   
-  cleanUp.hookIn (o) =>
+  cleanUp.hookIn (noop, o) =>
     if (watcher = o.watcher)?
       uncacheAll(o)
       watcher.close()
